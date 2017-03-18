@@ -1,45 +1,70 @@
 #ifndef ITERATORS_H
 #define ITERATORS_H
 
+#include "datatypes.h"
+
+
 template <typename T> 
-class v_iter
+class iter2d
 {
     public:
-        v_iter(T* _ref, const size_t _nelem, const size_t _offset) : nelem(_nelem), offset(_offset), data_ref(_ref) 
+        iter2d(T* _ref, const slab_layout_t<T> _sl, const size_t _offset_x, const size_t _offset_y, bool _trans) : 
+               data_ref(_ref), sl(_sl), offset_x(_offset_x), offset_y(_offset_y), transformed(_trans) 
         {
             //std::cout << "v_iter(T*, const size_t, const size_t" << std::endl;
             //std::cout << "    data at " << data_ref << ", nelem = " << nelem << ", offset = " << offset << std::endl;
         }
-        v_iter(T* _ref, const size_t _nelem) : nelem(_nelem), offset(0), data_ref(_ref) 
+        iter2d(T* _ref, const slab_layout_t<T> _sl, bool _trans) : data_ref(_ref), sl(_sl), offset_x(0), offset_y(0), transformed(_trans)
         {
             //std::cout << "v_iter(T*, const size_t nelem" << std::endl;
             //std::cout << "      data at " << data_ref << ", nelem = " << nelem << std::endl;
         }
     
+        size_t get_offset_x() const {return(offset_x);}
+        size_t get_offset_y() const {return(offset_y);}
 
-        size_t get_offset() const {return(offset);}
+        const slab_layout_t<T> get_sl() const { return(sl); }
 
-        v_iter<T>& operator++()  // pre-increment, ++iter
+        size_t get_max_x() const {return(transformed ? get_sl().get_nx() + get_sl().get_padx() : get_sl().get_nx()); }
+        size_t get_max_y() const {return(transformed ? get_sl().get_my() + get_sl().get_pady() : get_sl().get_my()); }
+
+
+        iter2d<T>& operator++()  // pre-increment, ++iter
         {
             // Increment offset and return this
             //std::cout << "v_iter<T>& operator++() " << std::endl;
-            ++offset;
+            if(offset_x < get_max_x())
+                ++offset_x;
+            else
+            {
+                offset_x = 0;
+                ++offset_y;
+            }
+            //std::cout << "iter2d :: operator++()\toffset = (" << offset_x << ", " << offset_y << ")\n"; 
+
             return (*this);
         }
 
-        v_iter<T> operator++(int) // post-increment, iter++
+        iter2d<T> operator++(int) // post-increment, iter++
         {
             // Create a copy, which we return. Increment the offset of this.
             //std::cout << "v_iter<T>& operator++(int) " << std::endl;
-            v_iter<T> clone(*this);
-            ++offset;
+            iter2d<T> clone(*this);
+            //std::cout << "iter2d :: operator++(int)\toffset = (" << offset_x << ", " << offset_y << ")\n"; 
+            if(offset_x < get_max_x())
+                ++offset_x;
+            else
+            {
+                offset_x = 0;
+                ++offset_y;
+            }
             return (clone);
         }
 
-        bool operator!= (const v_iter<T>& rhs)
+        bool operator!= (const iter2d<T>& rhs)
         {
             //std::cout << "v_iter :: operator !=  : "; 
-            if(get_offset() != rhs.get_offset())
+            if(get_offset_x() != rhs.get_offset_x() || get_offset_y() != rhs.get_offset_y())
             {
                 //std::cout << "true" << std::endl;
                 return(true);
@@ -51,18 +76,21 @@ class v_iter
             }
             
         }
-        
+
 
         T& operator*()
         {
             //std::cout << "v_iter :: operator*: data at " << data_ref << ", offset = " << get_offset() << ", val = " << data_ref[get_offset()] << std::endl;
-            return (data_ref[get_offset()]);
+            return (data_ref[(get_offset_x() + get_sl().get_padx()) + get_offset_y()]);
         }
+        
 
     private:
-        const size_t nelem;
-        size_t offset;
         T* data_ref;
+        const slab_layout_t<T> sl;
+        size_t offset_x;
+        size_t offset_y;
+        const bool transformed;
 };
 
 

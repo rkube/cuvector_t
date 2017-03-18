@@ -11,7 +11,7 @@
 
 
 template<typename T>
-void print(const vector<T>& vec)
+void print(const vector2d<T>& vec)
 {
     size_t n{0};
     for(auto v : vec)
@@ -22,12 +22,14 @@ void print(const vector<T>& vec)
 
 int main(void)
 {
-    // Create un-transformed vector with padding
-    vector<double> foo(8, 2);
-    print(foo);
+    slab_layout_t<double> sl(1.0, 1.0, 4, 1, 4, 1);
 
+    // Create un-transformed vector with padding
+    vector2d<double> foo(sl);
+    print(foo);
+    
     // Copy to new vector
-    vector<double> foo_copy(foo);
+    vector2d<double> foo_copy(foo);
     print(foo_copy);
 
     foo.set_transformed(true);
@@ -40,10 +42,10 @@ int main(void)
 
     print(foo_copy);
 
-    size_t n{0};
-    for(auto i = foo.begin(); i != foo.end(); i++)
-    {
-        std::cout << n++ << ": " << i.get_offset() << std::endl;
-    }
-
+    //size_t n{0};
+    //for(auto i = foo.begin(); i != foo.end(); i++)
+    //{
+    //    std::cout << n++ << ": " << i.get_offset() << std::endl;
+    //}
+    
 }
