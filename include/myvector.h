@@ -2,83 +2,91 @@
 #define MYVECTOR_H
 
 #include <iostream>
-#include "iterators.h"
+#include <cassert>
 
 template <typename T> class v_iter;
 
 template <typename T>
 class vector
 {
-    using iterator = v_iter<T>;
     public:
-        vector(const size_t);
+        using iterator_t = v_iter<T>;
+        vector(const size_t, const size_t);
         vector(const vector<T>&);
         ~vector();
 
-        void print();
-        size_t size() const {return (nelem);}
+        size_t size() const {return (get_nelem() + get_pad());}
 
-        iterator begin() const
+        iterator_t begin() const
         {
-            return (v_iter<T>(this -> get_data(), get_nelem(), 0));
+            return (iterator_t(this -> get_data(), get_nelem(), 0));
         }
 
-        iterator end() const
+        iterator_t end() const
         {
-            return (v_iter<T>(this -> get_data(), get_nelem(), get_nelem()));
+            // If the vector is transformed the end of the range is get_nelem() + get_pad().
+            // If the vector is not transformed the end of the range is get_nelem()
+            return(iterator_t(this -> get_data(),
+                              get_transformed() ? get_nelem() + get_pad() : get_nelem(),
+                              get_transformed() ? get_nelem() + get_pad() : get_nelem()));
         }
 
-        T& operator[](const size_t n)
-        {
-            if(n <= nelem)
-            {
-                return data[n];
-            }
-            else
-                throw std::logic_error("foo");
-        }
 
-        T* get_data() const {return(data);}
-        size_t get_nelem() const {return(nelem);}
+        void operator= (const vector<T>& rhs);
+
+        T* get_data() const { return(data); }
+        size_t get_nelem() const { return(nelem); }
+        size_t get_pad() const { return(pad); }
+
+        bool get_transformed() const { return(transformed); }
+        void set_transformed(bool tr) { transformed = tr; }
 
     private:
-        T* data;
         const size_t nelem;
+        const size_t pad;
+        bool transformed;
+        T* data;
 };
 
 
 template <typename T>
-vector<T> :: vector(const size_t _n) : nelem(_n), data{new T[_n]}
+vector<T> :: vector(const size_t _n, const size_t _pad) : nelem(_n), pad(_pad), transformed(false), data{new T[_n + _pad]}
 {
-    std::cout << "vector<T> :: vector(const size_t)" << std::endl;
-    std::cout << "    data at " << data << std::endl; 
-    std::cout << "    begin loop" << std::endl;
-    //for(auto i = this -> begin(); i != this -> end(); i++)
-    for(auto i : (*this))
-    {
+    // Use reference here!
+    for(auto& i : (*this))
         i = -3.14;
-        std::cout << "i = " << i <<  std::endl;
-    }
-    std::cout << "    end loop" << std::endl;
 }
 
 
 template <typename T>
-vector<T> :: vector(const vector<T>& rhs) : nelem(rhs.size()), data{new T[rhs.size()]}
+vector<T> :: vector(const vector<T>& rhs) : 
+    nelem(rhs.get_nelem()), 
+    pad(rhs.get_pad()), 
+    transformed(rhs.get_transformed()), 
+    data{new T[rhs.size()]}
 {
-    std::cout << "vector<T> :: vector(const vector<T>&)" << std::endl;
-    //auto i = this -> begin();
-    //for (auto r : rhs)
-    //    *i++ = r++;
-    auto i = this -> begin();
-    for(auto r = this -> begin(); r != this -> end(); ++r)
+    auto r = rhs.begin();
+    for(auto& i : (*this))
     {
-        std::cout << "i = " << *i << ", r = " << *r << std::endl;
-        *i = *r;
-        ++i;
+        i = *r++;
     }
 }
 
+
+template <typename T>
+void vector<T> :: operator=(const vector<T>& rhs)
+{
+    assert(get_nelem() == rhs.get_nelem());
+    assert(get_pad() == rhs.get_pad());
+
+    set_transformed(rhs.get_transformed());
+    auto r = rhs.begin();
+    for(auto& i : (*this))
+    {
+        i = *r++;
+    }
+
+}
 
 template <typename T>
 vector<T> :: ~vector()
@@ -86,4 +94,4 @@ vector<T> :: ~vector()
     delete [] data;
 }
 
-#endif // MYVECTOR
+#endif // MYVECTOR_H
