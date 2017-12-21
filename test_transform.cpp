@@ -4,7 +4,7 @@
 
 
 #include <iostream>
-#include <algorithm>
+#include <algorithm>  
 #include <exception>
 #include "include/myvector.h"
 #include "include/iterators.h"
@@ -22,15 +22,19 @@ void print(const vector2d<T>& vec)
 
 int main(void)
 {
-    slab_layout_t<double> sl(1.0, 1.0, 4, 1, 4, 1);
+    slab_layout_t<double> sl(1.0, 1.0, 4, 2, 2, 1);
 
     // Create un-transformed vector with padding
     vector2d<double> foo(sl);
+
+    std::cout << "Printing foo " << std::endl;
     print(foo);
     
     // Copy to new vector
-    vector2d<double> foo_copy(foo);
-    print(foo_copy);
+    //vector2d<double> foo_copy(foo);
+    //print(foo_copy);
+
+    std::cout << "=======================================================================================" << std::endl;
 
     foo.set_transformed(true);
 
@@ -38,14 +42,9 @@ int main(void)
         it = 12.2;
 
     print(foo);
-    foo_copy = foo;
+    //foo_copy = foo;
 
-    print(foo_copy);
+    //print(foo_copy);
 
-    //size_t n{0};
-    //for(auto i = foo.begin(); i != foo.end(); i++)
-    //{
-    //    std::cout << n++ << ": " << i.get_offset() << std::endl;
-    //}
-    
+    std::cout << "=======================================================================================" << std::endl;
 }

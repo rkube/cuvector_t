@@ -11,13 +11,13 @@ class iter2d
         iter2d(T* _ref, const slab_layout_t<T> _sl, const size_t _offset_x, const size_t _offset_y, bool _trans) : 
                data_ref(_ref), sl(_sl), offset_x(_offset_x), offset_y(_offset_y), transformed(_trans) 
         {
-            //std::cout << "v_iter(T*, const size_t, const size_t" << std::endl;
-            //std::cout << "    data at " << data_ref << ", nelem = " << nelem << ", offset = " << offset << std::endl;
+            //std::cout << "iter2d(T*, const size_t, const size_t" << std::endl;
+            //std::cout << "    data at " << data_ref <<  ", offset_x = " << offset_x << ", offset_y = " << offset_y << std::endl;
         }
         iter2d(T* _ref, const slab_layout_t<T> _sl, bool _trans) : data_ref(_ref), sl(_sl), offset_x(0), offset_y(0), transformed(_trans)
         {
-            //std::cout << "v_iter(T*, const size_t nelem" << std::endl;
-            //std::cout << "      data at " << data_ref << ", nelem = " << nelem << std::endl;
+            //std::cout << "iter2d(T*, const size_t nelem" << std::endl;
+            //std::cout << "    data at " << data_ref <<  ", offset_x = " << offset_x << ", offset_y = " << offset_y << std::endl;
         }
     
         size_t get_offset_x() const {return(offset_x);}
@@ -32,19 +32,44 @@ class iter2d
         iter2d<T>& operator++()  // pre-increment, ++iter
         {
             // Increment offset and return this
-            //std::cout << "v_iter<T>& operator++() " << std::endl;
-            if(offset_x < get_max_x())
+            assert(offset_x <= get_max_x());
+            assert(offset_y <= get_max_y());
+            std::cout << "iter2d<T>& operator++() input:";
+            std::cout << "\toffset_x = " << offset_x;
+            std::cout << "\toffset_y = " << offset_y << std::endl;
+            // See if we can increase the column index
+            if(offset_x < get_max_x() - 1)
+            {
+                // Increase the column
+                
                 ++offset_x;
+            }
             else
             {
-                offset_x = 0;
-                ++offset_y;
+                // See if we can increase the row index
+                if(offset_y < get_max_y() - 1)
+                {
+                    // Increase the row. Reset column index to zero.
+                    offset_x = 0;
+                    ++offset_y;
+                }
+                else
+                {
+                    ++offset_x;
+                    ++offset_y;
+                }
             }
-            //std::cout << "iter2d :: operator++()\toffset = (" << offset_x << ", " << offset_y << ")\n"; 
+            std::cout << "\titer2d :: operator++()\t exiting with offset = (" << offset_x << ", " << offset_y << ")" << std::endl;
+
+            assert(offset_x <= get_max_x() + 1);
+            assert(offset_y <= get_max_y() + 1);
+
 
             return (*this);
         }
 
+
+        /*
         iter2d<T> operator++(int) // post-increment, iter++
         {
             // Create a copy, which we return. Increment the offset of this.
@@ -60,6 +85,7 @@ class iter2d
             }
             return (clone);
         }
+        */
 
         bool operator!= (const iter2d<T>& rhs)
         {
@@ -80,16 +106,22 @@ class iter2d
 
         T& operator*()
         {
-            //std::cout << "v_iter :: operator*: data at " << data_ref << ", offset = " << get_offset() << ", val = " << data_ref[get_offset()] << std::endl;
-            return (data_ref[(get_offset_x() + get_sl().get_padx()) + get_offset_y()]);
+            return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * get_offset_y() + get_offset_x()]);
         }
         
 
     private:
+
+        // Pointer to the data
         T* data_ref;
+        // Stores the geometry and layout of the data
         const slab_layout_t<T> sl;
+        // Gives the current column index
         size_t offset_x;
+        // Gives the current row index
         size_t offset_y;
+        // If true, iterate over padding data
+        // If false, do not iterate over padding data
         const bool transformed;
 };
 

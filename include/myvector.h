@@ -28,8 +28,8 @@ class vector2d
             // If the vector is transformed the end of the range is get_nx() + get_padx().
             // If the vector is not transformed the end of the range is get_nx()
             return(iterator_t(this -> get_data(), get_sl(),
-                              get_transformed() ? get_sl().get_nx() + get_sl().get_padx() : get_sl().get_nx(),
-                              get_transformed() ? get_sl().get_my() + get_sl().get_pady() : get_sl().get_my(),
+                              get_transformed() ? get_sl().get_nx() + get_sl().get_padx(): get_sl().get_nx() ,
+                              get_transformed() ? get_sl().get_my() + get_sl().get_pady(): get_sl().get_my(),
                               get_transformed()));
         }
         
@@ -55,13 +55,16 @@ vector2d<T> :: vector2d(const slab_layout_t<T> _sl) :
     sl(_sl),
     //nelem((sl.get_nx() + sl.get_padx()) * (sl.get_my() + sl.get_pady())),
     nelem(size()),
-    transformed(false), data{new T[nelem]}
+    transformed(false), 
+    data{new T[nelem]}
 {
     // Use reference here!
     size_t n{0};
+
+    std::cout << "vector2d<T>: data at " << data << std::endl;
     for(auto& i : (*this))
     {
-        i = -3.14;
+        i = 2.19;
         std::cout << "vector2d<T> :: vector2d: n = " << n++ << std::endl;
     }
 }
