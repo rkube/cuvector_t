@@ -60,12 +60,9 @@ vector2d<T> :: vector2d(const slab_layout_t<T> _sl) :
 {
     // Use reference here!
     size_t n{0};
-
-    std::cout << "vector2d<T>: data at " << data << std::endl;
     for(auto& i : (*this))
     {
         i = 2.19;
-        std::cout << "vector2d<T> :: vector2d: n = " << n++ << std::endl;
     }
 }
 

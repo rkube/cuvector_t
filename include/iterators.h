@@ -34,9 +34,10 @@ class iter2d
             // Increment offset and return this
             assert(offset_x <= get_max_x());
             assert(offset_y <= get_max_y());
-            std::cout << "iter2d<T>& operator++() input:";
-            std::cout << "\toffset_x = " << offset_x;
-            std::cout << "\toffset_y = " << offset_y << std::endl;
+            //std::cout << "iter2d<T>& operator++() input:";
+            //std::cout << "\toffset_x = " << offset_x;
+            //std::cout << "\toffset_y = " << offset_y << std::endl;
+
             // See if we can increase the column index
             if(offset_x < get_max_x() - 1)
             {
@@ -59,11 +60,11 @@ class iter2d
                     ++offset_y;
                 }
             }
-            std::cout << "\titer2d :: operator++()\t exiting with offset = (" << offset_x << ", " << offset_y << ")" << std::endl;
+            //std::cout << "\titer2d :: operator++()\t exiting with offset = (" << offset_x << ", " << offset_y << ")" << std::endl;
 
+            // Use asserts to avoid non-terminating loops.
             assert(offset_x <= get_max_x() + 1);
             assert(offset_y <= get_max_y() + 1);
-
 
             return (*this);
         }
@@ -89,26 +90,59 @@ class iter2d
 
         bool operator!= (const iter2d<T>& rhs)
         {
-            //std::cout << "v_iter :: operator !=  : "; 
             if(get_offset_x() != rhs.get_offset_x() || get_offset_y() != rhs.get_offset_y())
             {
-                //std::cout << "true" << std::endl;
                 return(true);
             }
             else
             {
-                //std::cout << "false" << std::endl;
                 return(false);
             }
             
         }
 
-
         T& operator*()
         {
             return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * get_offset_y() + get_offset_x()]);
         }
+
+        T& here()
+        {
+            return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * get_offset_y() + get_offset_x()]);
+        }
         
+
+        T& right()
+        {
+            if(get_offset_x() < get_sl().get_nx() + get_sl().get_padx() - 1)
+                return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * get_offset_y() + get_offset_x() + 1]);
+            else
+                return(T(-42.0));
+        }
+
+        T& left()
+        {
+            if(get_offset_x() > 0)
+                return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * get_offset_y() + get_offset_x() + 1]);
+            else
+                return(T(-42.0));
+        }
+
+        T& up()
+        {
+            if(get_offset_y() < get_sl().get_my() + get_sl().get_pad_y() - 1)
+                return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * (get_offset_y() + 1) + get_offset_x() + 1]);
+            else
+                return(T(-24.0));
+        }
+
+        T& down()
+        {
+            if(get_offset_y() > 0)
+                return(data_ref[(get_sl().get_nx() + get_sl().get_padx()) * (get_offset_y() - 1) + get_offset_x() + 1]);
+            else
+                return(T(-24.0));
+        }
 
     private:
 
