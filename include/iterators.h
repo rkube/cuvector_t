@@ -11,13 +11,9 @@ class iter2d
         iter2d(T* _ref, const slab_layout_t<T> _sl, const size_t _offset_x, const size_t _offset_y, bool _trans) : 
                data_ref(_ref), sl(_sl), offset_x(_offset_x), offset_y(_offset_y), transformed(_trans) 
         {
-            //std::cout << "iter2d(T*, const size_t, const size_t" << std::endl;
-            //std::cout << "    data at " << data_ref <<  ", offset_x = " << offset_x << ", offset_y = " << offset_y << std::endl;
         }
         iter2d(T* _ref, const slab_layout_t<T> _sl, bool _trans) : data_ref(_ref), sl(_sl), offset_x(0), offset_y(0), transformed(_trans)
         {
-            //std::cout << "iter2d(T*, const size_t nelem" << std::endl;
-            //std::cout << "    data at " << data_ref <<  ", offset_x = " << offset_x << ", offset_y = " << offset_y << std::endl;
         }
     
         size_t get_offset_x() const {return(offset_x);}
@@ -34,9 +30,6 @@ class iter2d
             // Increment offset and return this
             assert(offset_x <= get_max_x());
             assert(offset_y <= get_max_y());
-            //std::cout << "iter2d<T>& operator++() input:";
-            //std::cout << "\toffset_x = " << offset_x;
-            //std::cout << "\toffset_y = " << offset_y << std::endl;
 
             // See if we can increase the column index
             if(offset_x < get_max_x() - 1)

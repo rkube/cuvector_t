@@ -3,12 +3,12 @@
     "configurations": [
 
         {
-            "name": "C++ Launch",
-            "type": "cppdbg",
+            "name": "lldb test_transform",
+            "type": "lldb",
             "request": "launch",
             "program": "${workspaceRoot}/test_transform",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,
@@ -23,7 +23,7 @@
                 ]
             },
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "/Users/ralph/local/bin/lldb"
             },
             "windows": {
                 "MIMode": "gdb",

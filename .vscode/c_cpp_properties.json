@@ -6,7 +6,7 @@
                 "/Users/ralph/local/include",
                 "/opt/local/include",
                 "/Users/ralph/source/vector1",
-                "/opt/local/include/gcc6/c++"
+                "/Users/ralph/local/include/c++/v1"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
