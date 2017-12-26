@@ -19,7 +19,7 @@ class vector2d
 
         T* get_data() const { return(data); }
         bounds_t get_bounds() const { return(bounds); }
-        size_t size() const { return( return(get_bounds().size()); }
+        size_t size() const { return(bounds().size()); }
 
     private:
         const bounds_t bounds;
@@ -30,8 +30,12 @@ class vector2d
 template <typename T>
 vector2d<T> :: vector2d(const bounds_t b_) :
     bounds(b_),
-    data{new T[nelem]}
+    data{new T[b_.size()]}
 {
+    for(size_t n = 0; n < bounds.size(); n++)
+    {
+        data[n] = T(0);
+    }
 }
 
 
@@ -39,7 +43,7 @@ vector2d<T> :: vector2d(const bounds_t b_) :
 template <typename T>
 void vector2d<T> :: operator=(const vector2d<T>& rhs)
 {
-    assert(bounds() == rhs.bounds());
+    assert(get_bounds() == rhs.get_bounds());
 /*
     set_transformed(rhs.get_transformed());
     auto r = rhs.begin();

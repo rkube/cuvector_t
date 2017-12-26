@@ -83,8 +83,8 @@ class bounds_t
 {
     public:
 
-        //using iterator       = bounds_iterator_t;
-        //using const_iterator = bounds_iterator_t;
+        using iterator       = bounds_iterator_t;
+        using const_iterator = bounds_iterator_t;
 
         constexpr bounds_t(const size_t Nx_, const size_t pad_nx_, const size_t My_, const size_t pad_my_) :
             Nx(Nx_), pad_nx(pad_nx_), My(My_), pad_my(pad_my_) 
@@ -155,6 +155,10 @@ class bounds_iterator_t
 {
     public:
         using iterator_category = std::random_access_iterator_tag;
+        using value_type = offset_t;
+        using difference_type = size_t;
+        using pointer = const offset_t*;
+        using reference = const offset_t;
 
         //bounds_iterator_t(const bounds_t& b_) noexcept : bounds(b_), offset{0, 0} {};
         bounds_iterator_t(const bounds_t& b_, offset_t o_ = {0, 0}) noexcept : bounds(b_), offset{o_} {};
@@ -164,11 +168,14 @@ class bounds_iterator_t
             return(offset == rhs.offset);
         }
         
+        pointer operator->() const {return(&offset);}
+        reference operator*() const {return(offset);}
+
         bounds_iterator_t operator++();
         bounds_iterator_t operator++(int);
         bounds_iterator_t& _setOffTheEnd();
 
-        const offset_t& get_offset() const {return(offset);}
+        const offset_t& get_offset() const {return offset;}
 
     private:
         const bounds_t bounds;
