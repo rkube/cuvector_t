@@ -3,8 +3,7 @@
  */
 
  #include <iostream>
- #include "include/myvector.h"
- #include "include/view.h"
+ #include "include/bounds.h"
 
  int main(void)
  {

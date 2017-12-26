@@ -25,6 +25,28 @@
             "problemMatcher": []
         },
         {
+            "label": "build test_bounds",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test_bounds"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "run test_bounds",
+            "type": "shell",
+            "command": "./test_bounds",
+            "group": {
+                "kind": "run"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "build test_view",
             "type": "shell",
             "command": "make",
