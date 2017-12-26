@@ -23,6 +23,28 @@
                 "kind": "run"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "build test_view",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test_view"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "run test_view",
+            "type": "shell",
+            "command": "./test_view",
+            "group": {
+                "kind": "run"
+            },
+            "problemMatcher": []
         }
     ]
 }

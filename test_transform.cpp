@@ -29,7 +29,7 @@ void print(const vector2d<T>& vec)
 
 int main(void)
 {
-    slab_layout_t<double> sl(1.0, 1.0, 8, 0, 8, 2);
+    slab_layout_t<double> sl(8, 0, 8, 2);
 
     // Create un-transformed vector with padding
     vector2d<double> foo(sl);

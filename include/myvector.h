@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "datatypes.h"
+#include "iterators.h"
 
 
 template <typename T> class iter2d;

@@ -4,3 +4,6 @@ CFLAGS = -std=c++14 -O0 -g -stdlib=libc++
 
 test_transform: test_transform.cpp include/iterators.h include/myvector.h
 	$(CC) $(CFLAGS) -o test_transform test_transform.cpp
+
+test_view: test_view.cpp include/myvector.h include/view.h
+	$(CC) $(CFLAGS) -o test_view test_view.cpp

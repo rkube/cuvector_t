@@ -3,10 +3,10 @@
     "configurations": [
 
         {
-            "name": "lldb test_transform",
+            "name": "lldb test_view",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceRoot}/test_transform",
+            "program": "${workspaceRoot}/test_view",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}",
