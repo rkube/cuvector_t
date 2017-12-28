@@ -24,13 +24,23 @@ class offset_t
 {
     public:
         offset_t(std::initializer_list<size_t> il) noexcept;
+        constexpr offset_t(const offset_t& rhs) noexcept : offset{rhs.offset} {}
 
         constexpr size_t& operator[](size_t n) {return(offset[n]);};
         constexpr const size_t& operator[](size_t n) const {return(offset[n]);};
 
         // Offset arithmetic
-        constexpr offset_t& operator+= (const offset_t&);
-        constexpr offset_t& operator-= (const offset_t&);
+        offset_t operator+() const noexcept {return(*this);}
+        offset_t operator-() const noexcept
+        {
+            offset_t copy{*this};
+            copy.offset[0] *= -1;
+            copy.offset[1] *= -1;
+            return(copy);
+        }
+
+        offset_t& operator+= (const offset_t);
+        offset_t& operator-= (const offset_t);
 
     private:
         std::array<size_t, 2> offset;
@@ -44,7 +54,7 @@ offset_t :: offset_t(std::initializer_list<size_t> il) noexcept
 }
 
 // Offset arithmetic
-constexpr offset_t& offset_t :: operator+= (const offset_t& rhs)
+offset_t& offset_t :: operator+= (const offset_t rhs)
 {
     (*this)[0] += rhs[0];
     (*this)[1] += rhs[1];
@@ -52,7 +62,7 @@ constexpr offset_t& offset_t :: operator+= (const offset_t& rhs)
     return(*this);
 }
 
-constexpr offset_t& offset_t :: operator-= (const offset_t& rhs)
+offset_t& offset_t :: operator-= (const offset_t rhs)
 {
     assert(rhs[0] <= (*this)[0]);
     assert(rhs[1] <= (*this)[1]);
@@ -64,15 +74,29 @@ constexpr offset_t& offset_t :: operator-= (const offset_t& rhs)
 }
 
 // Free functions
-constexpr bool operator==(const offset_t& lhs, const offset_t& rhs) noexcept
+bool operator==(const offset_t lhs, const offset_t rhs) noexcept
 {
     return( (lhs[0] == rhs[0]) && (lhs[1] == rhs[1]) );
 }
 
-constexpr bool operator!=(const offset_t& lhs, const offset_t& rhs) noexcept
+bool operator!=(const offset_t lhs, const offset_t rhs) noexcept
 {
     return(!(lhs == rhs));
 }
+
+offset_t operator+(const offset_t lhs, const offset_t rhs) noexcept
+{
+    offset_t copy{lhs};
+    return(copy += rhs);
+}
+
+offset_t operator-(const offset_t lhs, const offset_t rhs) noexcept
+{
+    offset_t copy{lhs};
+    return(copy -= rhs);
+}
+
+
 
 
 /*
@@ -97,10 +121,6 @@ class bounds_t
 
         bounds_iterator_t begin() const noexcept;
         bounds_iterator_t end() const noexcept;
-        //{
-        //    bounds_iterator_t iter(*this);
-        //    iter._setOffTheEnd();
-        //}
 
         // Element access
         constexpr size_t get_nx() const {return(Nx);}
@@ -155,12 +175,11 @@ class bounds_iterator_t
 {
     public:
         using iterator_category = std::random_access_iterator_tag;
-        using value_type = offset_t;
+        using value_type      = offset_t;
         using difference_type = size_t;
-        using pointer = const offset_t*;
-        using reference = const offset_t;
+        using pointer         = const offset_t*;
+        using reference       = const offset_t;
 
-        //bounds_iterator_t(const bounds_t& b_) noexcept : bounds(b_), offset{0, 0} {};
         bounds_iterator_t(const bounds_t& b_, offset_t o_ = {0, 0}) noexcept : bounds(b_), offset{o_} {};
         
         bool operator==(const bounds_iterator_t& rhs) const

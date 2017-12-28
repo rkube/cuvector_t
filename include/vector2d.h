@@ -34,7 +34,7 @@ vector2d<T> :: vector2d(const bounds_t b_) :
 {
     for(size_t n = 0; n < bounds.size(); n++)
     {
-        data[n] = T(0);
+        data[n] = T(n);
     }
 }
 
