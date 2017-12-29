@@ -67,6 +67,28 @@
                 "kind": "run"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "build test_interp",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test_interp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "run test_interp",
+            "type": "shell",
+            "command": "./test_interp",
+            "group": {
+                "kind": "run"
+            },
+            "problemMatcher": []
         }
     ]
 }

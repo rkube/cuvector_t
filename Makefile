@@ -10,3 +10,6 @@ test_bounds: test_bounds.cpp include/bounds.h
 
 test_view: test_view.cpp include/vector2d.h include/view.h include/bounds.h
 	$(CC) $(CFLAGS) -o test_view test_view.cpp
+
+test_interp: test_interp.cpp include/vector2d.h include/view.h include/bounds.h include/interp.h
+	$(CC) $(CFLAGS) -o test_interp test_interp.cpp

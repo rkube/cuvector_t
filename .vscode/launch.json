@@ -6,7 +6,7 @@
             "name": "lldb test_view",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceRoot}/test_view",
+            "program": "${workspaceRoot}/test_interp",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}",

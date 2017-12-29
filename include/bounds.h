@@ -123,12 +123,12 @@ class bounds_t
         bounds_iterator_t end() const noexcept;
 
         // Element access
-        constexpr size_t get_nx() const {return(Nx);}
-        constexpr size_t get_pad_nx() const {return(pad_nx);}
-        constexpr size_t nelem_x() const {return(Nx + pad_nx);}
-        constexpr size_t get_my() const {return(My);}
-        constexpr size_t get_pad_my() const {return(pad_my);}
-        constexpr size_t nelem_y() const {return(My + pad_my);}
+        constexpr size_t get_nx() const noexcept {return(Nx);}
+        constexpr size_t get_pad_nx() const noexcept {return(pad_nx);}
+        constexpr size_t nelem_x() const noexcept {return(Nx + pad_nx);}
+        constexpr size_t get_my() const noexcept {return(My);}
+        constexpr size_t get_pad_my() const noexcept {return(pad_my);}
+        constexpr size_t nelem_y() const noexcept {return(My + pad_my);}
 
         constexpr size_t size() const noexcept
         {
