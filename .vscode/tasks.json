@@ -89,6 +89,28 @@
                 "kind": "run"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "build test_apply",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "test_apply"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "run test_aply",
+            "type": "shell",
+            "command": "./test_apply",
+            "group": {
+                "kind": "run"
+            },
+            "problemMatcher": []
         }
     ]
 }

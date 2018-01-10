@@ -1,19 +1,44 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include "view.h"
+#include <iomanip>
 
-#include "vector2d.h"
-
-namespace vector
+namespace utility
 {
-    // Add lhs and rhs elementwise over 
-    template <typename T>
-    void add(vector2d<T>& lhs, const vector2d<T>& rhs, const bounds& b, const offset_t stride)
+    template <typename T, typename F>
+    void apply(strided_view<T>& view, F myfunc)
     {
-        std::cout << "vecto2d :: add" << std::endl;
+        for(auto& it : view.get_bounds())
+        {
+            view[it] = myfunc(view[it], it, view.get_geom());
+        }
+    }
+
+    template <typename T, typename F>
+    void elementwise(strided_view<T>& lhs, strided_view<T>& rhs, F myfunc)
+    {
+        assert(lhs.get_bounds() == rhs.get_bounds());
+        {
+            for(auto& it : lhs.get_bounds())
+            {
+                lhs[it] = myfunc(lhs[it], rhs[it], it, lhs.get_geom());
+            }
+        }
+    }
+
+    template<typename T>
+    void print(strided_view<T>& view)
+    {
+        for(auto it : view.get_bounds())
+        {
+            std::cout << std::setw(10) << view[it] << "\t";
+            if(it[1] == view.get_bounds().get_my() - 1)
+                std::cout << std::endl;
+        }
     }
 
 }
 
 
-#endif UTILITY_H
+#endif //UTILITY_H

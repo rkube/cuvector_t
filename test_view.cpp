@@ -19,7 +19,7 @@ int main(void)
     offset_t stride_double{My + pad_my, 1};
     offset_t stride_cmplx{My21, 1};
 
-    vector2d<double> vec(bounds_stride);
+    vector2d<double, allocator_host> vec(bounds_stride);
 
     strided_view<double> v_double(vec, bounds_double, stride_double);
     strided_view<std::complex<double>> v_cmplx(vec, bounds_cmplx, stride_cmplx);

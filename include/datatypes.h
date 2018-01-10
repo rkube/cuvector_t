@@ -3,6 +3,7 @@
 
 #include "bounds.h"
 
+/*
 template <typename T>
 class slab_layout_t
 {
@@ -32,6 +33,7 @@ class slab_layout_t
         const size_t My;
         const size_t pad_my;
 };
+*/
 
 enum class bc_t {bc_dirichlet, bc_neumann, bc_periodic, bc_null};
 
@@ -56,6 +58,18 @@ class geometry_t
         T get_y(const offset_t o_) const
         {
             return(get_ylo() + o_[1] * get_dy());
+        }
+
+        bool operator==(const geometry_t rhs) const
+        {
+            if( (get_xleft() == rhs.get_xleft()) &&
+                (get_dx() == rhs.get_dx()) &&
+                (get_ylo() == rhs.get_ylo()) &&
+                (get_dy() == rhs.get_dy()))
+            {
+                return(true);
+            }
+            return(false);
         }
 
     private:

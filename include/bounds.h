@@ -1,5 +1,5 @@
-#ifndef VIEW_H
-#define VIEW_H
+#ifndef BOUNDS_H
+#define BOUNDS_H
 
 #include <initializer_list>
 #include <array>
@@ -129,6 +129,7 @@ class bounds_t
         constexpr size_t get_my() const noexcept {return(My);}
         constexpr size_t get_pad_my() const noexcept {return(pad_my);}
         constexpr size_t nelem_y() const noexcept {return(My + pad_my);}
+        constexpr size_t get_nelem() const {return(nelem_x() * nelem_y());}
 
         constexpr size_t size() const noexcept
         {
@@ -279,4 +280,4 @@ bool operator!=(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
 
 
 
-#endif //VIEW_H
+#endif //BOUNDS_H

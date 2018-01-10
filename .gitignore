@@ -6,4 +6,5 @@ test_view
 test_view.dSYM
 test_interp
 test_interp.dSYM
-
+test_apply
+test_apply.dSYM

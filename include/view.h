@@ -3,6 +3,9 @@
 #include "interp.h"
 
 
+#ifndef VIEW_H
+#define VIEW_H
+
 // Members in an anonymous namespace are only visible in the local file scope
 namespace
 {
@@ -25,40 +28,40 @@ class strided_view
         using value         = T;
 
         // Construct a strided view, given a vector, bounds, and stride
-        template <typename U>
-        strided_view(vector2d<U>& vec_, const bounds_t b_, const offset_t s_, const T dx_ = 0) :
+        template <typename U, template<typename> class allocator>
+        strided_view(vector2d<U, allocator>& vec_, const size_t tlev, const bounds_t b_, const offset_t s_, const geometry_t<double> g_) :
             data{reinterpret_cast<T*>(vec_.get_data())}, 
             bounds{b_},
             stride{s_},
-            dx{dx_},
+            geom{g_},
             gp_interpolator_left{nullptr},
             gp_interpolator_right{nullptr}
             {}
 
         // Construct a strided view given a data pointer, bounds, and stride
         template <typename U>
-        strided_view(U* data_, const bounds_t b_, offset_t s_, const T dx_ = 0) :
+        strided_view(U* data_, const bounds_t b_, offset_t s_, const geometry_t<double> g_) :
             data{reinterpret_cast<T*>(data_)},
             bounds{b_},
             stride{s_},
-            dx{dx_},
+            geom{g_},
             gp_interpolator_left{nullptr},
             gp_interpolator_right{nullptr}           
             {}
 
         template <typename U>
-        strided_view(U* data_, const bounds_t b_, const offset_t s_, const T dx_, const bvals_t<U> bv_) :
-                    strided_view(data_, b_, s_, dx_)
+        strided_view(U* data_, const bounds_t b_, const offset_t s_, const T dx_, const bvals_t<U> bv_, const geometry_t<double> g_) :
+                    strided_view(data_, b_, s_, g_)
             {
                 std::cout << "strided_view :: strided_view(interpolating)" << std::endl;
                 switch(bv_.get_bc_left())
                 {
                     case bc_t::bc_dirichlet:
-                        gp_interpolator_left = new bval_interpolator_dirichlet_left<T>(bv_.get_bv_left(), dx);
+                        gp_interpolator_left = new bval_interpolator_dirichlet_left<T>(bv_.get_bv_left(), geom.get_dx());
                         break;
 
                     case bc_t::bc_neumann:
-                        gp_interpolator_left = new bval_interpolator_neumann_left<T>(bv_.get_bv_left(), dx);
+                        gp_interpolator_left = new bval_interpolator_neumann_left<T>(bv_.get_bv_left(), geom.get_dx());
                         break;
                     case bc_t::bc_periodic:
                     case bc_t::bc_null:
@@ -68,11 +71,11 @@ class strided_view
                 switch(bv_.get_bc_right())
                 {
                     case bc_t::bc_dirichlet:
-                        gp_interpolator_right = new bval_interpolator_dirichlet_right<T>(bv_.get_bv_right(), dx);
+                        gp_interpolator_right = new bval_interpolator_dirichlet_right<T>(bv_.get_bv_right(), geom.get_dx());
                         break;
 
                     case bc_t::bc_neumann:
-                        gp_interpolator_right = new bval_interpolator_neumann_right<T>(bv_.get_bv_right(), dx);
+                        gp_interpolator_right = new bval_interpolator_neumann_right<T>(bv_.get_bv_right(), geom.get_dx());
                         break;
                     case bc_t::bc_periodic:
                     case bc_t::bc_null:
@@ -151,12 +154,13 @@ class strided_view
 
         constexpr const bounds_t& get_bounds() const {return(bounds);}
         const offset_t& get_stride() const {return(stride);}
+        const geometry_t<double> get_geom() const {return(geom);}
 
     private:
         T* data;
         bounds_t bounds;
         offset_t stride;
-        const T dx;
+        geometry_t<double> geom;
         bval_interpolator<T>* gp_interpolator_left;
         bval_interpolator<T>* gp_interpolator_right;
 };
@@ -195,5 +199,4 @@ strided_view<T> strided_view<T> :: section(const offset_t origin, const offset_t
 
 }
 
-
-
+#endif //VIEW_H

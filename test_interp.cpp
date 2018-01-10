@@ -20,7 +20,7 @@ int main(void)
     const offset_t offset_inner{1, 0};
     const offset_t offset_right{Nx - 1, 0};
     bounds_t bounds(Nx, 0, My, 0);
-    vector2d<double> vec(bounds_t(Nx, pad_nx, My, pad_my));
+    vector2d<double, allocator_host> vec(bounds_t(Nx, pad_nx, My, pad_my));
 
     strided_view<double> view(vec, bounds, stride);
 
