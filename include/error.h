@@ -14,13 +14,13 @@
 #include <exception>
 #include <map>
 
-#if defined(__clang__) && defined(__CUDA__) && defined(__CUDA_ARCH__)
+#if defined (__CUDACC__)
 #include "cublas_v2.h"
 #include "cusparse.h"
 #endif //__CUDACC__
 
 
-#if defined(__clang__) && defined(__CUDA__) && defined(__CUDA_ARCH__)
+#if defined (__CUDACC__)
 class cublas_err : public std::exception
 {
     /**

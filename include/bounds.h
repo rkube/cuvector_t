@@ -5,6 +5,16 @@
 #include <array>
 #include <cassert>
 
+
+#if defined(__CUDACC__)
+#define CUDA_MEMBER __host__ __device__
+#endif
+
+#if !defined(__CUDACC__)
+#define CUDA_MEMBER)
+#endif
+
+
 /*
  * A simplified implementation of an array_view.
  * Inspired by https://github.com/wardw/array_view
@@ -23,15 +33,15 @@ class bounds_iterator_t;
 class offset_t
 {
     public:
-        offset_t(std::initializer_list<size_t> il) noexcept;
-        constexpr offset_t(const offset_t& rhs) noexcept : offset{rhs.offset} {}
+        CUDA_MEMBER offset_t(std::initializer_list<size_t> il) noexcept;
+        CUDA_MEMBER constexpr offset_t(const offset_t& rhs) noexcept : offset{rhs.offset} {}
 
-        constexpr size_t& operator[](size_t n) {return(offset[n]);};
-        constexpr const size_t& operator[](size_t n) const {return(offset[n]);};
+        CUDA_MEMBER constexpr size_t& operator[](size_t n) {return(offset[n]);};
+        CUDA_MEMBER constexpr const size_t& operator[](size_t n) const {return(offset[n]);};
 
         // Offset arithmetic
-        offset_t operator+() const noexcept {return(*this);}
-        offset_t operator-() const noexcept
+        CUDA_MEMBER offset_t operator+() const noexcept {return(*this);}
+        CUDA_MEMBER offset_t operator-() const noexcept
         {
             offset_t copy{*this};
             copy.offset[0] *= -1;
@@ -39,22 +49,23 @@ class offset_t
             return(copy);
         }
 
-        offset_t& operator+= (const offset_t);
-        offset_t& operator-= (const offset_t);
+        CUDA_MEMBER offset_t& operator+= (const offset_t);
+        CUDA_MEMBER offset_t& operator-= (const offset_t);
 
     private:
         std::array<size_t, 2> offset;
+        //size_t offset[2];
 };
 
 
-offset_t :: offset_t(std::initializer_list<size_t> il) noexcept
+CUDA_MEMBER offset_t :: offset_t(std::initializer_list<size_t> il) noexcept
 {
     assert(il.size() == 2);
     std::copy(il.begin(), il.end(), offset.data());
 }
 
 // Offset arithmetic
-offset_t& offset_t :: operator+= (const offset_t rhs)
+CUDA_MEMBER offset_t& offset_t :: operator+= (const offset_t rhs)
 {
     (*this)[0] += rhs[0];
     (*this)[1] += rhs[1];
@@ -62,7 +73,7 @@ offset_t& offset_t :: operator+= (const offset_t rhs)
     return(*this);
 }
 
-offset_t& offset_t :: operator-= (const offset_t rhs)
+CUDA_MEMBER offset_t& offset_t :: operator-= (const offset_t rhs)
 {
     assert(rhs[0] <= (*this)[0]);
     assert(rhs[1] <= (*this)[1]);
@@ -74,29 +85,27 @@ offset_t& offset_t :: operator-= (const offset_t rhs)
 }
 
 // Free functions
-bool operator==(const offset_t lhs, const offset_t rhs) noexcept
+CUDA_MEMBER bool operator==(const offset_t lhs, const offset_t rhs) noexcept
 {
     return( (lhs[0] == rhs[0]) && (lhs[1] == rhs[1]) );
 }
 
-bool operator!=(const offset_t lhs, const offset_t rhs) noexcept
+CUDA_MEMBER bool operator!=(const offset_t lhs, const offset_t rhs) noexcept
 {
     return(!(lhs == rhs));
 }
 
-offset_t operator+(const offset_t lhs, const offset_t rhs) noexcept
+CUDA_MEMBER offset_t operator+(const offset_t lhs, const offset_t rhs) noexcept
 {
     offset_t copy{lhs};
     return(copy += rhs);
 }
 
-offset_t operator-(const offset_t lhs, const offset_t rhs) noexcept
+CUDA_MEMBER offset_t operator-(const offset_t lhs, const offset_t rhs) noexcept
 {
     offset_t copy{lhs};
     return(copy -= rhs);
 }
-
-
 
 
 /*

@@ -8,3 +8,4 @@ test_interp
 test_interp.dSYM
 test_apply
 test_apply.dSYM
+test_bounds

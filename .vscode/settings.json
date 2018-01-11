@@ -38,6 +38,7 @@
         "system_error": "cpp",
         "cinttypes": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "memory": "cpp"
     }
 }

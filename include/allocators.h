@@ -4,22 +4,19 @@
  * https://rawgit.com/google/cxx-std-draft/allocator-paper/allocator_user_guide.html
  *
  */
-#ifndef ALLOCATOR_DEVICE_H
-#define ALLOCATOR_DEVICE_H
+
+#ifndef ALLOCATORS_H
+#define ALLOCATORS_H
 
 #include <memory>
 #include <iostream>
 #include "error.h"
 
-//#ifdef __CUDACC__
-#if defined(__clang__) && defined(__CUDA__) && defined(__CUDA_ARCH__)
+
+#if defined (__CUDACC__)
+
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-#endif //__CUDACC__
-
-
-//#ifdef __CUDACC__
-#if defined(__clang__) && defined(__CUDA__) && defined(__CUDA_ARCH__)
 template <typename T>
 struct deleter_device
 {
@@ -56,6 +53,7 @@ struct allocator_device
         {
             throw;
         }
+        //std::cerr << "allocator_device: allocated " << s << " * " << sizeof(T) << " bytes" << std::endl;
         return ptr_type(static_cast<T*>(ptr));
     }
 
@@ -155,6 +153,35 @@ struct my_allocator_traits
     using value_type = T;
 };
 
+template <typename T>
+struct my_allocator_traits<T, allocator_host> 
+{
+    using allocator_type = allocator_host<T>;
+    using value_type = T;
+    using deleter_type = deleter_host<T>;
+};
+
+
+#if defined(__CUDACC__)
+template <typename T>
+struct my_allocator_traits<T, allocator_device>
+{
+    using allocator_type = allocator_device<T>;
+    using value_type = T;
+    using deleter_type = deleter_device<T>;
+};
+
+
+#endif
+
+
+/*
+
+template<typename T, template <typename> class allocator>
+struct my_allocator_traits
+{
+    using value_type = T;
+};
 
 template <typename T>
 struct my_allocator_traits<T, allocator_host> 
@@ -174,8 +201,7 @@ struct my_allocator_traits<T*, allocator_host>
 };
 
 
-//#ifdef __CUDACC__
-#if defined(__clang__) && defined(__CUDA__) && defined(__CUDA_ARCH__)
+#if defined(__CUDACC__)
 template <typename T>
 struct my_allocator_traits<T, allocator_device>
 {
@@ -192,7 +218,8 @@ struct my_allocator_traits<T*, allocator_device>
     using value_type = T*;
     using deleter_type = deleter_device<T*>;
 };
-#endif //__CUDACC__
 
+#endif //__CUDACC__
+*/
 
 #endif //ALLOCATOR_DEVICE_H

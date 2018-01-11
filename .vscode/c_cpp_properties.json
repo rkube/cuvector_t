@@ -26,14 +26,16 @@
             "name": "Linux",
             "includePath": [
                 "/usr/include",
-                "/usr/local/include"
+                "/usr/local/include",
+                "/home/rku000/local/include/c++/v1"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "",
                 "path": [
                     "/usr/include",
-                    "/usr/local/include"
+                    "/usr/local/include",
+                    "/home/rku000/local/include/c++/v1"
                 ]
             },
             "intelliSenseMode": "clang-x64"

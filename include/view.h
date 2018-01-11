@@ -2,7 +2,6 @@
 #include "datatypes.h"
 #include "interp.h"
 
-
 #ifndef VIEW_H
 #define VIEW_H
 
@@ -12,24 +11,23 @@ namespace
     template <typename T>
     constexpr T& view_access(T* data, const offset_t& idx, const offset_t& stride)
     {
-        //const size_t offset{idx[0] * stride[0] + idx[1]};
         return data[idx[0] * stride[0] + idx[1]];
     }
 }
 
 
-template <typename T>
+template <typename T, typename P>
 class strided_view
 {
     public:
-
-        using pointer       = T*;
-        using reference     = T&;
-        using value         = T;
+        using pointer   = T*;
+        using reference = T&;
+        using value     = T;
+        using policy    = P;
 
         // Construct a strided view, given a vector, bounds, and stride
         template <typename U, template<typename> class allocator>
-        strided_view(vector2d<U, allocator>& vec_, const size_t tlev, const bounds_t b_, const offset_t s_, const geometry_t<double> g_) :
+        strided_view(vector2d<U, allocator>& vec_, const bounds_t b_, const offset_t s_, const geometry_t<double> g_) :
             data{reinterpret_cast<T*>(vec_.get_data())}, 
             bounds{b_},
             stride{s_},
@@ -50,7 +48,7 @@ class strided_view
             {}
 
         template <typename U>
-        strided_view(U* data_, const bounds_t b_, const offset_t s_, const T dx_, const bvals_t<U> bv_, const geometry_t<double> g_) :
+        strided_view(U* data_, const bounds_t b_, const offset_t s_, const geometry_t<double> g_, const bvals_t<U> bv_) :
                     strided_view(data_, b_, s_, g_)
             {
                 std::cout << "strided_view :: strided_view(interpolating)" << std::endl;
@@ -82,8 +80,6 @@ class strided_view
                         break;
                 }
             }
-
-        
 
         ~strided_view() noexcept
         {
@@ -149,8 +145,8 @@ class strided_view
         }
 
         // Returns view on a section
-        strided_view<T> section(const offset_t, const offset_t);
-        strided_view<T> section(const offset_t, const offset_t, const geometry_t<T>&, const bvals_t<T>&);
+        strided_view<T, P> section(const offset_t, const offset_t);
+        strided_view<T, P> section(const offset_t, const offset_t, const geometry_t<T>&, const bvals_t<T>&);
 
         constexpr const bounds_t& get_bounds() const {return(bounds);}
         const offset_t& get_stride() const {return(stride);}
@@ -165,8 +161,8 @@ class strided_view
         bval_interpolator<T>* gp_interpolator_right;
 };
 
-template <typename T>
-strided_view<T> strided_view<T> :: section(const offset_t origin, const offset_t window)
+template <typename T, typename P>
+strided_view<T, P> strided_view<T, P> :: section(const offset_t origin, const offset_t window)
 {   
     // Assert that the origin is a valid index
     assert(bounds.contains(origin));
@@ -182,20 +178,20 @@ strided_view<T> strided_view<T> :: section(const offset_t origin, const offset_t
 
     //bounds_t tmp(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my());
     // Construct a new bounds_t given the window.
-    return strided_view<T>(&(*this)[origin], 
-                           bounds_t(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my()), 
-                           stride);
+    return strided_view<T, P>(&(*this)[origin], 
+                              bounds_t(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my()), 
+                              get_stride(), get_geom());
 }
 
-template <typename T>
-strided_view<T> strided_view<T> :: section(const offset_t origin, const offset_t window, const geometry_t<T>& geom, const bvals_t<T>& bvals)
+template <typename T, typename P>
+strided_view<T, P> strided_view<T, P> :: section(const offset_t origin, const offset_t window, const geometry_t<T>& geom, const bvals_t<T>& bvals)
 {
     assert(bounds.contains(origin));
     assert(bounds.contains(window - offset_t{1,1}));
     std::cout << "strided_view<T> :: section with IP" << std::endl;
-    return strided_view<T>(&(*this)[origin], 
-                           bounds_t(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my()), 
-                           stride, geom.get_dx(), bvals);
+    return strided_view<T, P>(&(*this)[origin], 
+                              bounds_t(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my()), 
+                              stride, geom.get_dx(), bvals);
 
 }
 

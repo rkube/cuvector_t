@@ -5,6 +5,17 @@
 #include "include/view.h"
 #include "include/utility.h"
 
+
+#ifdef __CUDACC__
+using real_vec = vector2d<double, allocator_device>;
+#endif
+
+#ifndef __CUDACC__
+using real_vec = vector2d<double, allocator_host>;
+#endif
+
+using host_vec = vector2d<double, allocator_host>;
+
 int main(void)
 {
     const size_t Nx{8};
@@ -18,11 +29,28 @@ int main(void)
     const offset_t stride_double{My + pad_my, 1};
 
     bounds_t bounds(Nx, pad_nx, My, 0);
-    vector2d<double, allocator_host> vec1(bounds_t{Nx, pad_nx, My, pad_my});
-    vector2d<double, allocator_host> vec2(bounds_t{Nx, pad_nx, My, pad_my});
+    //vector2d<double, allocator_host> vec1(bounds_t{Nx, pad_nx, My, pad_my});
+    real_vec vec1(bounds_t{Nx, pad_nx, My, pad_my});
 
-    strided_view<double> view1(vec1, 0, bounds, stride_double, geom);
-    strided_view<double> view2(vec2, 0, bounds, stride_double, geom);
+    //vector2d<double, allocator_host> vec2(bounds_t{Nx, pad_nx, My, pad_my});
+
+    utility :: apply(vec1, [=] (double input, const offset_t o, const geometry_t<double> geom) -> double
+                    {
+                        return(geom.get_x(o));
+                    }, bounds, stride_double, geom);
+
+#ifdef __CUDACC__
+    host_vec res(bounds_t{Nx, pad_nx, My, pad_my});
+    utility :: print(utility :: create_host_vector(vec1), bounds, stride_double);
+#endif
+
+#ifndef __CUDACC__
+    utility :: print(vec1, bounds, stride_double);
+#endif
+
+    /*
+    strided_view<double, host_tag> view1(vec1, bounds, stride_double, geom);
+    strided_view<double, host_tag> view2(vec2, bounds, stride_double, geom);
 
     utility :: apply(view1, [=] (double input, const offset_t o, const geometry_t<double> geom) -> double
                     {
@@ -41,6 +69,7 @@ int main(void)
                     });
 
     utility :: print(view1);
+    */
     
     return(0.0);
 }
