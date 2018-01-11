@@ -2,7 +2,6 @@
 #define UTILITY_H
 
 #include "view.h"
-#include "policy.h"
 #include <iomanip>
 #include <sstream>
 

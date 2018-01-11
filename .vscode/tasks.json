@@ -4,27 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build test_transform",
-            "type": "shell",
-            "command": "make",
-            "args": [
-                "test_transform"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "label": "run test_transform",
-            "type": "shell",
-            "command": "./test_transform",
-            "group": {
-                "kind": "run"
-            },
-            "problemMatcher": []
-        },
-        {
             "label": "build test_bounds",
             "type": "shell",
             "command": "make",
@@ -104,7 +83,7 @@
             "problemMatcher": []
         },
         {
-            "label": "run test_aply",
+            "label": "run test_apply",
             "type": "shell",
             "command": "./test_apply",
             "group": {

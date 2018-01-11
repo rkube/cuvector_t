@@ -8,8 +8,8 @@
  int main(void)
  {
     
-    offset_t o1{0, 0};
-    offset_t o2{1, 1};
+    offset_t o1(0, 0);
+    const offset_t o2(1, 1);
 
     o1 += o2;
     if(o1 == o1)

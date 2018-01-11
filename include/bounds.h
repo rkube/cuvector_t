@@ -11,7 +11,7 @@
 #endif
 
 #if !defined(__CUDACC__)
-#define CUDA_MEMBER)
+#define CUDA_MEMBER
 #endif
 
 
@@ -33,8 +33,19 @@ class bounds_iterator_t;
 class offset_t
 {
     public:
-        CUDA_MEMBER offset_t(std::initializer_list<size_t> il) noexcept;
-        CUDA_MEMBER constexpr offset_t(const offset_t& rhs) noexcept : offset{rhs.offset} {}
+        // Two constructors below need std::array on cuda. Not working as of clang-7
+        //CUDA_MEMBER offset_t(std::initializer_list<size_t> il) noexcept;
+        //CUDA_MEMBER constexpr offset_t(const offset_t& rhs) noexcept : offset{rhs.offset} {}
+        CUDA_MEMBER offset_t(const size_t o1, const size_t o2) noexcept 
+        {
+            offset[0] = o1; 
+            offset[1] = o2;
+        }
+        CUDA_MEMBER offset_t(const offset_t& rhs) noexcept 
+        {
+            offset[0] = rhs[0]; 
+            offset[1] = rhs[1];
+        }
 
         CUDA_MEMBER constexpr size_t& operator[](size_t n) {return(offset[n]);};
         CUDA_MEMBER constexpr const size_t& operator[](size_t n) const {return(offset[n]);};
@@ -53,16 +64,19 @@ class offset_t
         CUDA_MEMBER offset_t& operator-= (const offset_t);
 
     private:
-        std::array<size_t, 2> offset;
-        //size_t offset[2];
+        // Prefer std::array, but clang is not there yet.
+        //std::array<size_t, 2> offset;
+        size_t offset[2];
 };
 
 
+/*
 CUDA_MEMBER offset_t :: offset_t(std::initializer_list<size_t> il) noexcept
 {
     assert(il.size() == 2);
     std::copy(il.begin(), il.end(), offset.data());
 }
+*/
 
 // Offset arithmetic
 CUDA_MEMBER offset_t& offset_t :: operator+= (const offset_t rhs)
@@ -97,13 +111,16 @@ CUDA_MEMBER bool operator!=(const offset_t lhs, const offset_t rhs) noexcept
 
 CUDA_MEMBER offset_t operator+(const offset_t lhs, const offset_t rhs) noexcept
 {
-    offset_t copy{lhs};
+    // Use initializer list once clang gets there.
+    //offset_t copy{lhs};
+    offset_t copy(lhs[0], lhs[1]);
     return(copy += rhs);
 }
 
 CUDA_MEMBER offset_t operator-(const offset_t lhs, const offset_t rhs) noexcept
 {
-    offset_t copy{lhs};
+    //offset_t copy{lhs};
+    offset_t copy(lhs[0], lhs[1]);
     return(copy -= rhs);
 }
 
@@ -285,8 +302,6 @@ bool operator!=(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
 {
     return(!(lhs.operator==(rhs)));
 }
-
-
 
 
 #endif //BOUNDS_H

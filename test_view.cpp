@@ -18,13 +18,13 @@ int main(void)
 
     const geometry_t<double> geom(0.0, 1.0, 0.0, 1.0);
 
-    const offset_t stride_double{My + pad_my, 1};
-    const offset_t stride_cmplx{My21, 1};
+    const offset_t stride_double(My + pad_my, 1);
+    const offset_t stride_cmplx(My21, 1);
 
     vector2d<double, allocator_host> vec(bounds_stride);
 
-    strided_view<double> v_double(vec, bounds_double, stride_double, geom);
-    strided_view<std::complex<double> > v_cmplx(vec, bounds_cmplx, stride_cmplx, geom);
+    strided_view<double, host_tag> v_double(vec, bounds_double, stride_double, geom);
+    strided_view<std::complex<double>, host_tag > v_cmplx(vec, bounds_cmplx, stride_cmplx, geom);
 
     std::cout << "Viewing as double:" << std::endl;
     for(auto& i1 : v_double.get_bounds())
@@ -46,7 +46,7 @@ int main(void)
     std::cout << "Testing section: " << std::endl;
     const offset_t origin{1, 1};
     const offset_t window{2, 2};
-    strided_view<double> sec = v_double.section(origin, window);
+    strided_view<double, host_tag> sec = v_double.section(origin, window);
 
     for(auto& i1: sec.get_bounds())
     {

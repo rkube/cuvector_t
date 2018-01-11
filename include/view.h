@@ -1,6 +1,7 @@
 #include "vector2d.h"
 #include "datatypes.h"
 #include "interp.h"
+#include "policy.h"
 
 #ifndef VIEW_H
 #define VIEW_H
@@ -191,7 +192,7 @@ strided_view<T, P> strided_view<T, P> :: section(const offset_t origin, const of
     std::cout << "strided_view<T> :: section with IP" << std::endl;
     return strided_view<T, P>(&(*this)[origin], 
                               bounds_t(window[0], bounds.get_pad_nx(), window[1], bounds.get_pad_my()), 
-                              stride, geom.get_dx(), bvals);
+                              stride, geom, bvals);
 
 }
 

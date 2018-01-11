@@ -15,18 +15,18 @@ int main(void)
     const geometry_t<double> geom(0.0, 0.125, 0.0, 0.125);
     const bvals_t<double> bvals(0.0, 0.0, bc_t::bc_dirichlet, bc_t::bc_dirichlet);
 
-    const offset_t stride{My + pad_my, 1};
-    const offset_t offset_left{0, 0};
-    const offset_t offset_inner{1, 0};
-    const offset_t offset_right{Nx - 1, 0};
+    const offset_t stride(My + pad_my, 1);
+    const offset_t offset_left(0, 0);
+    const offset_t offset_inner(1, 0);
+    const offset_t offset_right(Nx - 1, 0);
     bounds_t bounds(Nx, 0, My, 0);
     vector2d<double, allocator_host> vec(bounds_t(Nx, pad_nx, My, pad_my));
 
-    strided_view<double> view(vec, bounds, stride);
+    strided_view<double, host_tag> view(vec, bounds, stride, geom);
 
-    strided_view<double> view_left = view.section(offset_left, offset_t{1, My}, geom, bvals);
-    strided_view<double> view_inner = view.section(offset_inner, offset_t{Nx - 2, My});
-    strided_view<double> view_right = view.section(offset_right, offset_t{1, My}, geom, bvals);
+    strided_view<double, host_tag> view_left = view.section(offset_left, offset_t{1, My}, geom, bvals);
+    strided_view<double, host_tag> view_inner = view.section(offset_inner, offset_t{Nx - 2, My});
+    strided_view<double, host_tag> view_right = view.section(offset_right, offset_t{1, My}, geom, bvals);
 
     offset_t i{0, 0};
     for(auto& i1: view_left.get_bounds())
