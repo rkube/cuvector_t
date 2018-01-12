@@ -1,5 +1,5 @@
 #CC = /opt/lo/bin/g++-mp-6
-CC = /Users/ralph/local/bin/clang++
+CC = /home/rku000/local/bin/clang++
 CUDACC = /home/rku000/local/bin/clang++
 CFLAGS = -std=c++14 -O0 -g -stdlib=libc++
 

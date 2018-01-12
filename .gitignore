@@ -9,3 +9,4 @@ test_interp.dSYM
 test_apply
 test_apply.dSYM
 test_bounds
+test_vector_device

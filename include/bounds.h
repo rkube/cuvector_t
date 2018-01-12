@@ -136,28 +136,28 @@ class bounds_t
         using iterator       = bounds_iterator_t;
         using const_iterator = bounds_iterator_t;
 
-        constexpr bounds_t(const size_t Nx_, const size_t pad_nx_, const size_t My_, const size_t pad_my_) :
+        CUDA_MEMBER constexpr bounds_t(const size_t Nx_, const size_t pad_nx_, const size_t My_, const size_t pad_my_) :
             Nx(Nx_), pad_nx(pad_nx_), My(My_), pad_my(pad_my_) 
             {}
 
-        constexpr bounds_t(const bounds_t& rhs) : Nx(rhs.get_nx()), pad_nx(rhs.get_pad_nx()), My(rhs.get_my()), pad_my(rhs.get_pad_my()) 
+        CUDA_MEMBER constexpr bounds_t(const bounds_t& rhs) : Nx(rhs.get_nx()), pad_nx(rhs.get_pad_nx()), My(rhs.get_my()), pad_my(rhs.get_pad_my()) 
             {}
 
-        constexpr bool contains(const offset_t&) const noexcept;
+        CUDA_MEMBER constexpr bool contains(const offset_t&) const noexcept;
 
-        bounds_iterator_t begin() const noexcept;
-        bounds_iterator_t end() const noexcept;
+        CUDA_MEMBER bounds_iterator_t begin() const noexcept;
+        CUDA_MEMBER bounds_iterator_t end() const noexcept;
 
         // Element access
-        constexpr size_t get_nx() const noexcept {return(Nx);}
-        constexpr size_t get_pad_nx() const noexcept {return(pad_nx);}
-        constexpr size_t nelem_x() const noexcept {return(Nx + pad_nx);}
-        constexpr size_t get_my() const noexcept {return(My);}
-        constexpr size_t get_pad_my() const noexcept {return(pad_my);}
-        constexpr size_t nelem_y() const noexcept {return(My + pad_my);}
-        constexpr size_t get_nelem() const {return(nelem_x() * nelem_y());}
+        CUDA_MEMBER constexpr size_t get_nx() const noexcept {return(Nx);}
+        CUDA_MEMBER constexpr size_t get_pad_nx() const noexcept {return(pad_nx);}
+        CUDA_MEMBER constexpr size_t nelem_x() const noexcept {return(Nx + pad_nx);}
+        CUDA_MEMBER constexpr size_t get_my() const noexcept {return(My);}
+        CUDA_MEMBER constexpr size_t get_pad_my() const noexcept {return(pad_my);}
+        CUDA_MEMBER constexpr size_t nelem_y() const noexcept {return(My + pad_my);}
+        CUDA_MEMBER constexpr size_t get_nelem() const {return(nelem_x() * nelem_y());}
 
-        constexpr size_t size() const noexcept
+        CUDA_MEMBER constexpr size_t size() const noexcept
         {
             return ((Nx + pad_nx) * (My + pad_my));
         }
@@ -171,7 +171,7 @@ class bounds_t
 
 
 // Check if an index is within bounds
-constexpr bool bounds_t :: contains(const offset_t& idx) const noexcept
+CUDA_MEMBER constexpr bool bounds_t :: contains(const offset_t& idx) const noexcept
 {
     if( (idx[0] < nelem_x()) && (idx[1] < nelem_y()) )
         return(true);
@@ -182,14 +182,14 @@ constexpr bool bounds_t :: contains(const offset_t& idx) const noexcept
 // Free functions
 
 // Returns true if lhs and rhs describe the same bounds
-constexpr bool operator==(const bounds_t& lhs, const bounds_t& rhs) noexcept
+CUDA_MEMBER constexpr bool operator==(const bounds_t& lhs, const bounds_t& rhs) noexcept
 {
     if( (lhs.nelem_x() == rhs.nelem_x()) && (lhs.nelem_y() == rhs.nelem_y()) )
         return true;
     return false;
 }
 
-constexpr bool operator!=(const bounds_t& lhs, const bounds_t& rhs) noexcept
+CUDA_MEMBER constexpr bool operator!=(const bounds_t& lhs, const bounds_t& rhs) noexcept
 {
     return(!(lhs == rhs));
 }
@@ -207,33 +207,33 @@ class bounds_iterator_t
         using pointer         = const offset_t*;
         using reference       = const offset_t;
 
-        bounds_iterator_t(const bounds_t& b_, offset_t o_ = {0, 0}) noexcept : bounds(b_), offset{o_} {};
+        CUDA_MEMBER bounds_iterator_t(const bounds_t& b_, offset_t o_ = {0, 0}) noexcept : bounds(b_), offset{o_} {};
         
-        bool operator==(const bounds_iterator_t& rhs) const
+        CUDA_MEMBER bool operator==(const bounds_iterator_t& rhs) const
         {
             return(offset == rhs.offset);
         }
         
-        pointer operator->() const {return(&offset);}
-        reference operator*() const {return(offset);}
+        CUDA_MEMBER pointer operator->() const {return(&offset);}
+        CUDA_MEMBER reference operator*() const {return(offset);}
 
-        bounds_iterator_t operator++();
-        bounds_iterator_t operator++(int);
-        bounds_iterator_t& _setOffTheEnd();
+        CUDA_MEMBER bounds_iterator_t operator++();
+        CUDA_MEMBER bounds_iterator_t operator++(int);
+        CUDA_MEMBER bounds_iterator_t& _setOffTheEnd();
 
-        const offset_t& get_offset() const {return offset;}
+        CUDA_MEMBER const offset_t& get_offset() const {return offset;}
 
     private:
         const bounds_t bounds;
         offset_t offset;
 };
 
-bounds_iterator_t bounds_t::begin() const noexcept
+CUDA_MEMBER bounds_iterator_t bounds_t::begin() const noexcept
 {
     return(bounds_iterator_t(*this));
 }
 
-bounds_iterator_t bounds_t::end() const noexcept
+CUDA_MEMBER bounds_iterator_t bounds_t::end() const noexcept
 {
     bounds_iterator_t iter(*this);
     iter._setOffTheEnd();
@@ -243,7 +243,7 @@ bounds_iterator_t bounds_t::end() const noexcept
 
 // Increments the offset and return this
 // The last dimension (offset[1]) is contiguous in memory. Iterate over this dimension first.
-bounds_iterator_t bounds_iterator_t::operator++()
+CUDA_MEMBER bounds_iterator_t bounds_iterator_t::operator++()
 {
     assert(offset[0] <= bounds.nelem_x());
     assert(offset[1] <= bounds.nelem_y());
@@ -273,14 +273,14 @@ bounds_iterator_t bounds_iterator_t::operator++()
     return (*this);
 }
 
-bounds_iterator_t bounds_iterator_t::operator++(int)
+CUDA_MEMBER bounds_iterator_t bounds_iterator_t::operator++(int)
 {
     bounds_iterator_t tmp{*this};
     ++(*this);
     return(tmp);
 }
 
-bounds_iterator_t& bounds_iterator_t::_setOffTheEnd()
+CUDA_MEMBER bounds_iterator_t& bounds_iterator_t::_setOffTheEnd()
 {
     offset[0] = bounds.nelem_x() - 1;
     offset[1] = bounds.nelem_y();
@@ -293,12 +293,12 @@ bounds_iterator_t& bounds_iterator_t::_setOffTheEnd()
 // Free functions
 ////////////////////////////////////////////////////////////////////////////////
 
-bool operator==(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
+CUDA_MEMBER bool operator==(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
 {
     return(lhs.operator==(rhs));
 }
 
-bool operator!=(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
+CUDA_MEMBER bool operator!=(const bounds_iterator_t& lhs, const bounds_iterator_t& rhs)
 {
     return(!(lhs.operator==(rhs)));
 }
