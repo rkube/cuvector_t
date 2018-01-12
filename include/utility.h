@@ -34,9 +34,9 @@ namespace
 namespace device
 {
 
-    template <typename T, typename F>
+    template <typename T, typename UnaryOp>
     __global__
-    void kernel_apply(T* data, F myfunc, const bounds_t bounds, const offset_t stride, const geometry_t<T> geom)
+    void kernel_apply(T* data, UnaryOp myfunc, const bounds_t bounds, const offset_t stride, const geometry_t<T> geom)
     {
         strided_view<T> view(data, bounds, stride);
         offset_t offset_kernel(thread_idx :: get_row(), thread_idx :: get_col());
@@ -51,6 +51,22 @@ namespace device
             //view[offset_kernel] = T(threadIdx.x + 10 * blockIdx.x + 100 * threadIdx.y + 1000 * blockIdx.y);
         }
     }
+
+
+    template <typename T, typename BinaryOp>
+    __global__
+    void kernel_elementwise(T* lhs, T* rhs, BinaryOp myfunc, const bounds_t bounds, const offset_t stride)
+    {
+        strided_view<T> view_lhs(lhs, bounds, stride);
+        strided_view<T> view_rhs(rhs, bounds, stride);
+
+        offset_t offset_kernel(thread_idx :: get_row(), thread_idx :: get_col());
+
+        if(bounds.contains(offset_kernel))
+        {
+            view_lhs[offset_kernel] = myfunc(view_lhs[offset_kernel], view_rhs[offset_kernel]);
+        }
+    }
 } // End namespace device
 #endif // __CUDACC__
 
@@ -59,23 +75,46 @@ namespace device
 namespace detail
 {
 #if defined (__CUDACC__)
-    template<typename T, typename F>
-    void impl_apply(vector2d<T, allocator_device>& vec, F myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_device<T>)
+    template<typename T, typename UnaryOp>
+    void impl_apply(vector2d<T, allocator_device>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_device<T>)
     {
         dim3 block{5, 5};
         dim3 grid{2, 2};
         device :: kernel_apply<<<grid, block>>>(vec.get_data(), myfunc, bounds, stride, geom);
     }
+
+    template<typename T, typename BinaryOp>
+    void impl_elementwise(vector2d<T, allocator_device>& lhs, 
+                          vector2d<T, allocator_device>& rhs,
+                          BinaryOp myfunc, const bounds_t& bounds, const offset_t& stride, allocator_device<T>)
+    {
+        dim3 block{5, 5};
+        dim3 grid{2, 2};
+        device :: kernel_elementwise<<<grid, block>>>(lhs.get_data(), rhs.get_data(), myfunc, bounds, stride);
+    }
+    
 #endif //__CUDACC__
 
 
-    template<typename T, typename F>
-    void impl_apply(vector2d<T, allocator_host>& vec, F myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_host<T>)
+    template<typename T, typename UnaryOp>
+    void impl_apply(vector2d<T, allocator_host>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_host<T>)
     {
-        strided_view<double> view(vec, bounds, stride);  
-        for(auto& it : view.get_bounds())
+        strided_view<T> view(vec, bounds, stride);  
+        for(auto& it : bounds)
         {
-            view[it] = myfunc(view[it], it, geom());
+            view[it] = myfunc(view[it], it, geom);
+        }
+    }
+
+    template <typename T, typename BinaryOp>
+    void impl_elementwise(vector2d<T, allocator_host>& lhs, vector2d<T, allocator_host>& rhs, BinaryOp myfunc, const bounds_t& bounds, const offset_t& stride, allocator_host<T>)
+    {
+        strided_view<T> view_lhs(lhs, bounds, stride);
+        strided_view<T> view_rhs(rhs, bounds, stride);
+
+        for(auto& it: bounds)
+        {
+            view_lhs[it] = myfunc(view_lhs[it], view_rhs[it]);
         }
     }
 }
@@ -93,25 +132,20 @@ namespace utility
     }
 #endif
 
-    template <typename T, template <typename> class allocator, typename F>
-    inline void apply(vector2d<T, allocator>& vec, F myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom)
+    template <typename T, template <typename> class allocator, typename UnaryOp>
+    inline void apply(vector2d<T, allocator>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom)
     {
         detail :: impl_apply(vec, myfunc, bounds, stride, geom, typename vector2d<T, allocator>::allocator_type{});
     }
 
-    /*
-    template <typename T, typename P, typename F>
-    void elementwise(strided_view<T, P>& lhs, strided_view<T, P>& rhs, F myfunc)
+    template <typename T, template <typename> class allocator, typename BinaryOp>
+    void elementwise(vector2d<T, allocator>& lhs, vector2d<T, allocator>& rhs, BinaryOp myfunc, const bounds_t& bounds, const offset_t& stride)
     {
-        assert(lhs.get_bounds() == rhs.get_bounds());
-        {
-            for(auto& it : lhs.get_bounds())
-            {
-                lhs[it] = myfunc(lhs[it], rhs[it], it, lhs.get_geom());
-            }
-        }
+        assert(lhs.get_bounds().contains(bounds.end().get_offset()));
+        assert(rhs.get_bounds().contains(bounds.end().get_offset()));
+
+        detail :: impl_elementwise(lhs, rhs, myfunc, bounds, stride, typename vector2d<T, allocator>::allocator_type{});
     }
-    */
 
 
     template<typename T, template <typename> class allocator>
@@ -125,6 +159,7 @@ namespace utility
                 std::cout << std::endl;
         }    }
 
+#if defined(__CUDACC__)
     template<typename T, template <typename> class allocator>
     inline void print(vector2d<T, allocator> vec, const bounds_t bounds, const offset_t& stride)
     {
@@ -136,6 +171,7 @@ namespace utility
                 std::cout << std::endl;
         }
     }
+#endif
 }
 
 #endif //UTILITY_H

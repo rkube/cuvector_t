@@ -282,6 +282,11 @@ CUDA_MEMBER bounds_iterator_t bounds_iterator_t::operator++(int)
 
 CUDA_MEMBER bounds_iterator_t& bounds_iterator_t::_setOffTheEnd()
 {
+    // This defines the end of the iteration and is used f.ex. in range-based for loops.
+    // This needs to be an upper bound of the iteration and returns the last element
+    // not included in the loop.
+    // As the slow dimension, return nelem_x - 1
+    // As the fast dimension, return nelem_y.
     offset[0] = bounds.nelem_x() - 1;
     offset[1] = bounds.nelem_y();
 

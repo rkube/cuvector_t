@@ -33,12 +33,20 @@ int main(void)
     const bvals_t<double> bvals(0.0, 0.0, bc_t::bc_dirichlet, bc_t::bc_dirichlet);
 
     real_vec vec1(bounds_full);
+    real_vec vec2(bounds_full);
 
     utility :: apply(vec1, [=] LAMBDACALLER (double input, const offset_t o, const geometry_t<double> geom) -> double
                     {
                         //return(3.39);
                         return(geom.get_x(o));
                     }, bounds_view, stride_double, geom);
+
+    utility :: apply(vec2, [=] LAMBDACALLER (double input, const offset_t o, const geometry_t<double> geom) -> double
+                    {
+                        //return(3.39);
+                        return(geom.get_x(o));
+                    }, bounds_view, stride_double, geom);
+
 
 #ifdef __CUDACC__
     utility :: print(utility :: create_host_vector(vec1), bounds_view, stride_double);
@@ -48,6 +56,18 @@ int main(void)
     utility :: print(vec1, bounds_view, stride_double);
 #endif
  
+    utility :: elementwise(vec1, vec2, [=] LAMBDACALLER (double lhs, double rhs) -> double
+                            { return(lhs + rhs); }, bounds_view, stride_double);;
+
+#ifdef __CUDACC__
+    utility :: print(utility :: create_host_vector(vec1), bounds_view, stride_double);
+#endif
+
+#ifndef __CUDACC__
+    utility :: print(vec1, bounds_view, stride_double);
+#endif
+
+
     /*
     strided_view<double, host_tag> view1(vec1, bounds, stride_double, geom);
     strided_view<double, host_tag> view2(vec2, bounds, stride_double, geom);
