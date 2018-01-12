@@ -20,8 +20,8 @@ test_interp: test_interp.cpp include/vector2d.h include/view.h include/bounds.h 
 	$(CC) $(CFLAGS) -o test_interp test_interp.cpp
 
 test_apply: test_apply.cpp include/vector2d.h include/utility.h
-#	$(CC) $(CFLAGS) -o test_apply test_apply.cpp
-	$(CUDACC) $(CUDACFLAGS) -x cuda -o test_apply test_apply.cpp $(CUDALFLAGS)
+	$(CC) $(CFLAGS) -o test_apply test_apply.cpp
+#	$(CUDACC) $(CUDACFLAGS) -x cuda -o test_apply test_apply.cpp $(CUDALFLAGS)
 
 
 test_vector_device: test_vector_device.cpp

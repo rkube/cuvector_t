@@ -36,7 +36,7 @@ namespace device
 
     template <typename T, typename UnaryOp>
     __global__
-    void kernel_apply(T* data, UnaryOp myfunc, const bounds_t bounds, const offset_t stride, const geometry_t<T> geom)
+    void kernel_apply(T* data, UnaryOp myfunc, const bounds_t bounds, const offset_t stride, const geometry_t<double> geom)
     {
         strided_view<T> view(data, bounds, stride);
         offset_t offset_kernel(thread_idx :: get_row(), thread_idx :: get_col());
@@ -76,7 +76,7 @@ namespace detail
 {
 #if defined (__CUDACC__)
     template<typename T, typename UnaryOp>
-    void impl_apply(vector2d<T, allocator_device>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_device<T>)
+    void impl_apply(vector2d<T, allocator_device>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<double>& geom, allocator_device<T>)
     {
         dim3 block{5, 5};
         dim3 grid{2, 2};
@@ -97,7 +97,7 @@ namespace detail
 
 
     template<typename T, typename UnaryOp>
-    void impl_apply(vector2d<T, allocator_host>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom, allocator_host<T>)
+    void impl_apply(vector2d<T, allocator_host>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<double>& geom, allocator_host<T>)
     {
         strided_view<T> view(vec, bounds, stride);  
         for(auto& it : bounds)
@@ -133,7 +133,7 @@ namespace utility
 #endif
 
     template <typename T, template <typename> class allocator, typename UnaryOp>
-    inline void apply(vector2d<T, allocator>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<T>& geom)
+    inline void apply(vector2d<T, allocator>& vec, UnaryOp myfunc, const bounds_t& bounds, const offset_t& stride, const geometry_t<double>& geom)
     {
         detail :: impl_apply(vec, myfunc, bounds, stride, geom, typename vector2d<T, allocator>::allocator_type{});
     }

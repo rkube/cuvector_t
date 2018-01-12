@@ -1,22 +1,28 @@
 #include <iostream>
 #include <iomanip>
+#include <complex>
 
 #include "include/vector2d.h"
 #include "include/view.h"
 #include "include/utility.h"
 
+using cmplx_t = std::complex<double>;
+
 #if defined(__CUDACC__)
 using real_vec = vector2d<double, allocator_device>;
+using cmplx_vec = vector2d<cmplx_t, allocator_device>;
 #define LAMBDACALLER __host__ __device__
 
 #endif
 
 #if !defined(__CUDACC__)
 using real_vec = vector2d<double, allocator_host>;
+using cmplx_vec = vector2d<cmplx_t, allocator_host>;
 #define LAMBDACALLER
 #endif
 
-using host_vec = vector2d<double, allocator_host>;
+//using host_vec = vector2d<double, allocator_host>;
+using host_vec = vector2d<cmplx_t, allocator_host>;
 
 int main(void)
 {
@@ -32,16 +38,16 @@ int main(void)
     const geometry_t<double> geom(0.0, 0.125, 0.0, 0.125);
     const bvals_t<double> bvals(0.0, 0.0, bc_t::bc_dirichlet, bc_t::bc_dirichlet);
 
-    real_vec vec1(bounds_full);
-    real_vec vec2(bounds_full);
+    cmplx_vec vec1(bounds_full);
+    cmplx_vec vec2(bounds_full);
 
-    utility :: apply(vec1, [=] LAMBDACALLER (double input, const offset_t o, const geometry_t<double> geom) -> double
+    utility :: apply(vec1, [=] LAMBDACALLER (cmplx_t input, const offset_t o, const geometry_t<double> geom) -> cmplx_t
                     {
                         //return(3.39);
                         return(geom.get_x(o));
                     }, bounds_view, stride_double, geom);
 
-    utility :: apply(vec2, [=] LAMBDACALLER (double input, const offset_t o, const geometry_t<double> geom) -> double
+    utility :: apply(vec2, [=] LAMBDACALLER (cmplx_t input, const offset_t o, const geometry_t<double> geom) -> cmplx_t
                     {
                         //return(3.39);
                         return(geom.get_x(o));
@@ -56,7 +62,7 @@ int main(void)
     utility :: print(vec1, bounds_view, stride_double);
 #endif
  
-    utility :: elementwise(vec1, vec2, [=] LAMBDACALLER (double lhs, double rhs) -> double
+    utility :: elementwise(vec1, vec2, [=] LAMBDACALLER (std::complex<double> lhs, std::complex<double> rhs) -> std::complex<double>
                             { return(lhs + rhs); }, bounds_view, stride_double);;
 
 #ifdef __CUDACC__
